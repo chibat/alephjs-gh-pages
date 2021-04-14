@@ -5,11 +5,11 @@ export default function useCounter(): [number, boolean, () => void, () => void] 
   const [isSyncing, setIsSyncing] = useState(true)
   const increase = useCallback(() => {
     setCount(n => n + 1)
-    fetch('/api/counter/increase').catch(e => console.error(e))
+    // fetch('/api/counter/increase').catch(e => console.error(e))
   }, [])
   const decrease = useCallback(() => {
     setCount(n => n - 1)
-    fetch('/api/counter/decrease').catch(e => console.error(e))
+    // fetch('/api/counter/decrease').catch(e => console.error(e))
   }, [])
 
   useEffect(() => {

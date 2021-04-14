@@ -2,6 +2,7 @@
 
 set -e
 
+rm -rf .aleph
 aleph build
 touch docs/.nojekyll
 git add .
