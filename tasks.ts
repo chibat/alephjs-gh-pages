@@ -10,14 +10,11 @@ const TASKS = [build, dev, start, deploy];
 
 async function build() {
   rm(".aleph");
-  await $([
-    Deno.execPath(),
-    "run",
+  await denoRun([
     "--allow-net=deno.land,esm.sh,cdn.esm.sh",
     "--allow-read=.," + Deno.execPath() + "," + await denoDir(),
     "--allow-write=.aleph,docs," + await denoDir(),
     "--allow-env=ALEPH_DEV,ALEPH_DEV_PORT,ALEPH_VERSION,ALEPH_BUILD_MODE,ALEPH_FRAMEWORK",
-    "--allow-run=" + Deno.execPath(),
     alephCliPath(),
     "build",
   ]);
@@ -32,28 +29,22 @@ async function deploy() {
 }
 
 async function dev() {
-  await $([
-    Deno.execPath(),
-    "run",
+  await denoRun([
     "--allow-net=deno.land,esm.sh,cdn.esm.sh,:8080",
     "--allow-read=.," + Deno.execPath() + "," + await denoDir(),
     "--allow-write=.aleph," + await denoDir(),
     "--allow-env=ALEPH_DEV,ALEPH_DEV_PORT,ALEPH_VERSION,ALEPH_BUILD_MODE,ALEPH_FRAMEWORK",
-    "--allow-run=" + Deno.execPath(),
     alephCliPath(),
     "dev",
   ]);
 }
 
 async function start() {
-  await $([
-    Deno.execPath(),
-    "run",
+  await denoRun([
     "--allow-net=deno.land,esm.sh,:8080",
     "--allow-read=.," + Deno.execPath() + "," + await denoDir(),
     "--allow-write=.aleph," + await denoDir(),
     "--allow-env=ALEPH_DEV,ALEPH_DEV_PORT,ALEPH_VERSION,ALEPH_BUILD_MODE,ALEPH_FRAMEWORK",
-    "--allow-run=" + Deno.execPath(),
     alephCliPath(),
     "start",
   ]);
@@ -72,17 +63,6 @@ function alephCliPath() {
 // Utility
 //
 
-async function denoDir() {
-  const p = Deno.run({
-    cmd: [Deno.execPath(), "info", "--json", "--unstable"],
-    stdout: "piped",
-    stderr: "null",
-  });
-  const output = (new TextDecoder()).decode(await p.output());
-  p.close();
-  return JSON.parse(output).denoDir;
-}
-
 async function $(cmd: string[] | string) {
   const command = cmd instanceof Array ? cmd : cmd.split(" ");
   const status = await Deno.run({
@@ -95,10 +75,27 @@ async function $(cmd: string[] | string) {
   }
 }
 
+async function denoRun(params: string[]) {
+  await $(
+    [Deno.execPath(), "run", "--allow-run=" + Deno.execPath()].concat(params),
+  );
+}
+
 function rm(path: string) {
   if (existsSync(path)) {
     Deno.removeSync(path, { recursive: true });
   }
+}
+
+async function denoDir() {
+  const p = Deno.run({
+    cmd: [Deno.execPath(), "info", "--json", "--unstable"],
+    stdout: "piped",
+    stderr: "null",
+  });
+  const output = (new TextDecoder()).decode(await p.output());
+  p.close();
+  return JSON.parse(output).denoDir;
 }
 
 //
