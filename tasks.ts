@@ -11,10 +11,10 @@ const TASKS = [build, dev, start, deploy];
 async function build() {
   rm(".aleph");
   await denoRun([
-    "--allow-net=deno.land,esm.sh,cdn.esm.sh",
+    "--allow-net=deno.land,esm.sh,cdn.esm.sh,registry.npmjs.org",
     "--allow-read=.," + Deno.execPath() + "," + await denoDir(),
-    "--allow-write=.aleph,docs," + await denoDir(),
-    "--allow-env=ALEPH_DEV,ALEPH_DEV_PORT,ALEPH_VERSION,ALEPH_BUILD_MODE,ALEPH_FRAMEWORK",
+    "--allow-write",
+    "--allow-env=ALEPH_DEV,ALEPH_DEV_PORT,ALEPH_VERSION,ALEPH_BUILD_MODE,ALEPH_FRAMEWORK,ESBUILD_BINARY_PATH,XDG_CACHE_HOME,HOME",
     alephCliPath(),
     "build",
   ]);
@@ -77,7 +77,7 @@ async function $(cmd: string[] | string) {
 
 async function denoRun(params: string[]) {
   await $(
-    [Deno.execPath(), "run", "--allow-run=" + Deno.execPath()].concat(params),
+    [Deno.execPath(), "run", "--allow-run"].concat(params),
   );
 }
 
